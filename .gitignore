@@ -38,3 +38,4 @@ vignettes/*.pdf
 # DATA TOO BIG
 Data/*
 Data/
+.DS_Store
