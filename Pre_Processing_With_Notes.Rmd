@@ -1,0 +1,58 @@
+---
+title: "Processing_USAccidents"
+author: "Carlos Mercado"
+date: "7/31/2020"
+output: html_document
+---
+
+# Intro 
+
+We're looking at this 3.5M US Accidents dataset from Feb 2016 - June 2020. 
+See citation and website here:
+
+Moosavi, Sobhan, Mohammad Hossein Samavatian, Srinivasan Parthasarathy, 
+and Rajiv Ramnath. “A Countrywide Traffic Accident Dataset.”, arXiv preprint arXiv:1906.05409 (2019).
+
+https://smoosavi.org/datasets/us_accidents
+
+# Pre-Processing - Fixing Excessive NAs 
+
+Reading only a randomly selected 200,000 rows for initial analysis. 
+We notice the following patterns of data missingness. 
+
+```{r,eval = FALSE}
+library(tidyverse)
+library(ggplot2)
+
+# NOTE: by default reads the down_sampled 200k rows
+accidents <- readRDS("Data/sample_USAccidents_June20.rds")
+
+# str(object = accidents)
+# summary(object = accidents)
+
+percent_NA <- function(column){ 
+  mean( is.na ( column ))
+  }
+
+percent_na_vector <- unlist(lapply(accidents, FUN = percent_NA))
+sort(percent_na_vector)
+
+```
+
+Most data is either nearly entirely available or nearly entirely missing.
+The difficult features are:
+
+* Wind Speed (mph) - 13% missing
+    + There are erroneous speeds (i.e. 580mph) but the vast majority are < 10mph 
+    + Going to make wind speeds that are NA -> 0 mph (we will categorize these later)
+* TMC (Traffic Message Channel) - 30% missing
+    + Going to remove because the vast majority is just the generic 201 code
+    + meaning "accident", no need to really keep this.
+* Wind Chill (F) - 53% missing
+    + Going to remove because wind speed seems fine and temperature is only 2% missing.
+* Precipitation (inches) - 57.5% missing
+    + Going to remove this column, because Weather Condition is available. 
+* Number - 64% missing - low equity in general, easy to remove
+* EndLat/EndLng - 100% missing - easy to remove
+
+# Feature Engineering

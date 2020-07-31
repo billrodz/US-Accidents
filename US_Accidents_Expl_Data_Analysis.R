@@ -1,63 +1,62 @@
 # Exploratory Data Analysis
 library(tidyverse)
-library(dplyr)
 library(ggplot2)
 
-exploratory_df <- read_csv(file = "Data/US_Accidents_June20.csv")
+# NOTE: by default reads the down_sampled 200k rows
+accidents <- readRDS("Data/sample_USAccidents_June20.rds")
 
-str(object = exploratory_df)
-summary(object = exploratory_df)
+# str(object = accidents)
+# summary(object = accidents)
 
-# Dropping col w/ greater than ~500,000 missing observations of the 3.5 million
-exploratory_df <- select(.data = exploratory_df, -c("TMC", 
-                                                    "End_Lat",
-                                                    "End_Lng",
-                                                    "Number",
-                                                    "Wind_Chill(F)",
-                                                    "Wind_Speed(mph)",
-                                                    "Precipitation(in)"))
+percent_NA <- function(column){ 
+  mean( is.na ( column ))
+  }
 
-exploratory_df$Severity <- as.factor(exploratory_df$Severity)
-exploratory_df$Side <- as.factor(exploratory_df$Side)
-exploratory_df$City <- as.factor(exploratory_df$City)
-exploratory_df$County <- as.factor(exploratory_df$County)
-exploratory_df$State <- as.factor(exploratory_df$State)
-exploratory_df$Zipcode <- as.factor(exploratory_df$Zipcode)
-exploratory_df$Country <- as.factor(exploratory_df$Country)
-exploratory_df$Wind_Direction <- as.factor(exploratory_df$Wind_Direction)
-exploratory_df$Wind_Direction <- as.factor(exploratory_df$Weather_Condition)
+percent_na_vector <- unlist(lapply(accidents, FUN = percent_NA))
+sort(percent_na_vector)
 
-hist(x = exploratory_df$Start_Lat)
-barplot(table(exploratory_df$Start_Lat))
-hist(x = exploratory_df$Start_Lng)
-barplot(table(exploratory_df$Start_Lng))
-hist(x = exploratory_df$`Temperature(F)`)
-barplot(table(exploratory_df$`Temperature(F)`))
-hist(x = exploratory_df$`Humidity(%)`)
-barplot(table(exploratory_df$`Humidity(%)`))
-hist(x = exploratory_df$`Pressure(in)`, breaks = 10)
-barplot(table(exploratory_df$`Pressure(in)`))
-hist(x = exploratory_df$`Visibility(mi)`)
-barplot(table(exploratory_df$`Visibility(mi)`))
 
-new_plot <- ggplot(data = exploratory_df,mapping = aes(x = Severity, 
+
+accidents$Severity <- as.factor(accidents$Severity)
+accidents$Side <- as.factor(accidents$Side)
+accidents$City <- as.factor(accidents$City)
+accidents$County <- as.factor(accidents$County)
+accidents$State <- as.factor(accidents$State)
+accidents$Zipcode <- as.factor(accidents$Zipcode)
+accidents$Country <- as.factor(accidents$Country)
+accidents$Wind_Direction <- as.factor(accidents$Wind_Direction)
+accidents$Wind_Direction <- as.factor(accidents$Weather_Condition)
+
+hist(x = accidents$Start_Lat)
+hist(x = accidents$Start_Lng)
+
+hist(x = accidents$`Temperature(F)`)
+
+hist(x = accidents$`Humidity(%)`)
+barplot(table(accidents$`Humidity(%)`))
+hist(x = accidents$`Pressure(in)`, breaks = 10)
+barplot(table(accidents$`Pressure(in)`))
+hist(x = accidents$`Visibility(mi)`)
+barplot(table(accidents$`Visibility(mi)`))
+
+new_plot <- ggplot(data = accidents,mapping = aes(x = Severity, 
                                                        y = Side)) +
   geom_count()
 
-other_plot <- ggplot(data = exploratory_df, mapping = aes(x = Country, 
+other_plot <- ggplot(data = accidents, mapping = aes(x = Country, 
                                                           y =Severity )) +
   geom_count()
 
-this_plot <- ggplot(data = exploratory_df, mapping = aes(x = Severity, 
+this_plot <- ggplot(data = accidents, mapping = aes(x = Severity, 
                                                          y = Wind_Direction)) +
   geom_count()
 
-one_more_plot <- ggplot(data = exploratory_df, mapping = aes(x = Severity, 
+one_more_plot <- ggplot(data = accidents, mapping = aes(x = Severity, 
                                                              y = Weather_Condition)) +
   geom_count()
 
 # Removing NAs from dataframe
-df_no_na <- na.omit(object = exploratory_df)
+df_no_na <- na.omit(object = accidents)
 
 hist(x = df_no_na$Start_Lat)
 barplot(table(df_no_na$Start_Lat))
