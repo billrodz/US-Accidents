@@ -24,6 +24,7 @@ We notice the following patterns of data missingness.
 library(tidyverse)
 library(ggplot2)
 
+
 # NOTE: by default reads the down_sampled 200k rows
 accidents <- readRDS("Data/sample_USAccidents_June20.rds")
 
