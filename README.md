@@ -32,7 +32,7 @@ can we predict accidents and their severity using weather forecasts (i.e.
 can a predictive model identify the number of accidents across severities given
 weather conditions). 
 
-Are primary hypothesis is that severe weather events such as thunderstorms and rain 
+Our primary hypothesis is that severe weather events such as thunderstorms and rain 
 together will be associated with more accidents and/or more severity of the accidents.
 This may end up being only partially true, especially if people drive more
 carefully in severe weather events and/or if we people avoid driving in them. 
@@ -42,18 +42,37 @@ the "worst" drivers.
 
 ###### How we would know we're right 
 
+Experiment Statement: Periods of severe weather will lead to an increased number 
+of severe accidents; 
+
 The dataset is quite large (3.5M rows) so for simplicity we took a simple random 
 sample of 200,000 rows. We *did not* stratify or cluster our sample based on 
 population of any geographic area (e.g. county or state) nor stratify or cluster
 our sample based on the proportional frequency of a geographic area in the 
 full dataset. We treat the population as the 3.5M and the 200,000 rows as a
-sample for estimating all of our statistics. 
+sample for estimating all of our statistics. We would know we're correct if in
+similar time periods in similar places with different weather conditions had 
+both more accidents and more severe ones associated with the different weather 
+conditions. We would then model this behavior and predict accident frequency
+and severity in the population (3.5M Accidents). 
+
+##### Narrative Logic 
+
+Assume: 
+* Driving frequency in static conditions has normal predictable seasonality.
+    + That is, for the same location with the same weather, July 2015 and July 2019 should have similar driving patterns all else equal. 
+* Data collection is not itself impacted by weather conditions or changes over the study period. Or more plainly, the accidents have minimal exogenous bias. 
+    + i.e., a thunderstorm didn't take out the power and accidents occured without being tracked. 
+    
+For a specific location, differences in accident counts and severities will 
+be impacted by weather conditions. 
 
 
 ##### Predicting Accident Severity 
 
 Taking the February 2016 - January 2019 data from our sample, can we 
 predict accidents in each month from February 2019 - January 2020.  
+
 
 ##### Worst Drivers 
 
