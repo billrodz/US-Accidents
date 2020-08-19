@@ -61,8 +61,31 @@ accidents_select <- accidents[ , desired_columns]
 
 # Function to convert Weather Timestamp to Day of the Week 
 
+weekday_weather <- function(accidents_dataset, 
+                            weather_timestamp = "Weather_Timestamp"){
+  day_of_week <- wday(x = accidents_dataset[[weather_timestamp]], 
+                      label = TRUE, 
+                      abbr = FALSE)
+  accidents_dataset[["Weekday_of_Weather"]] <- day_of_week
+  return(accidents_dataset)
+}
+
+accidents <- weekday_weather(accidents)
+
 # Function to convert Weather Timestamp to Weekday OR Weekend 
 
+weather_weekday_or_weekend <- function(accidents_dataset, 
+                                       weather_timestamp = "Weather_Timestamp"){
+  day_of_week <- wday(x = accidents_dataset[[weather_timestamp]], 
+                      label = FALSE)
+  weekday_or_weekend <- ifelse(day_of_week == 1 | day_of_week == 7, 
+                               "Weekend", 
+                               "Weekday")
+  accidents_dataset[["Weather_Weekday_Weekend"]] <- weekday_or_weekend
+  return(accidents_dataset)
+}
+
+accidents <- weather_weekday_or_weekend(accidents)
 
 # Weather Features ----
 
@@ -104,12 +127,51 @@ accidents <- add_thunder(accidents)
 
 # Function to identify if "Rain" is in the Weather Condition 
 
+add_rain <- function(accidents_dataset, weather_column = "Weather_Condition"){
+  pattern <- "rain|drizzle|mist|shower"
+  rain_found <- grepl(pattern = pattern, 
+                      x = accidents_dataset[[weather_column]],
+                      ignore.case = TRUE,
+                      perl = TRUE)
+  
+  accidents_dataset[["Rain"]] <- as.numeric(rain_found)
+  return(accidents_dataset)
+}
+
+accidents <- add_rain(accidents)
+
 # Function to identify if "Snow" is in the Weather Condition
+
+add_snow <- function(accidents_dataset, weather_column = "Weather_Condition"){
+  pattern <- "snow|ice|freezing|wintry|hail"
+  snow_found <- grepl(pattern = pattern, 
+                      x = accidents_dataset[[weather_column]], 
+                      ignore.case = TRUE,
+                      perl = TRUE)
+  
+  accidents_dataset[["Snow"]] <- as.numeric(snow_found)
+  return(accidents_dataset)
+}
+
+accidents <- add_snow(accidents)
 
 # NOTE: Some columns will be removed in modeling and haven't been engineered
 
 # Alter Severity to be binary - < 3 or 3+ (call it Low and High) 
   # MAKE SURE the levels are Low = 0, and High = 1 !!!! 
 
+severity_now <- function(accidents_dataset, severity_column = "Severity"){
+  severity_high_low <- ifelse(accidents_dataset[[severity_column]] == 4, 
+                              "High", 
+                              "Low")
+  severity_binary <- ifelse(severity_high_low == "High", 1, 0)
+  
+  accidents_dataset[["Severity_Binary"]] <- severity_binary
+  return(accidents_dataset)
+}
+
+accidents <- severity_now(accidents)
+
 # SAVE THE FINAL DATASET - accidents_for_modeling
+
 
