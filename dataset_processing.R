@@ -174,4 +174,4 @@ accidents <- severity_now(accidents)
 
 # SAVE THE FINAL DATASET - accidents_for_modeling
 
-
+saveRDS(object = accidents, file = "Data/processed_accidents.rds")
