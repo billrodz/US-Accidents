@@ -218,7 +218,7 @@ add_snow <- function(accidents_dataset, weather_column = "Weather_Condition"){
 #'
 #' @return accidents_dataset
 severity_now <- function(accidents_dataset, severity_column = "Severity"){
-  severity_high_low <- ifelse(accidents_dataset[[severity_column]] == 4, 
+  severity_high_low <- ifelse(accidents_dataset[[severity_column]] %in% c(3, 4), 
                               "High", 
                               "Low")
   severity_binary <- ifelse(severity_high_low == "High", 1, 0)
