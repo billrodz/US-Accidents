@@ -61,6 +61,16 @@ accidents_select <- accidents[ , desired_columns]
 
 # Function to convert Weather Timestamp to Day of the Week 
 
+#' Title
+#' @description This function accepts the accidents data set and the weather 
+#' timestamp column. The function uses the timestamp to determine the day of the
+#' on which the accident occurred. This information is added to a "Weekday of 
+#' Weather" column that is appended to the accidents data set. The function then
+#' returned the accidents data set. 
+#' @param accidents_dataset 
+#' @param weather_timestamp 
+#'
+#' @return accidents_dataset
 weekday_weather <- function(accidents_dataset, 
                             weather_timestamp = "Weather_Timestamp"){
   day_of_week <- wday(x = accidents_dataset[[weather_timestamp]], 
@@ -70,10 +80,19 @@ weekday_weather <- function(accidents_dataset,
   return(accidents_dataset)
 }
 
-accidents <- weekday_weather(accidents)
-
 # Function to convert Weather Timestamp to Weekday OR Weekend 
 
+#' Title
+#' @description This function accepts the accidents data set and weather 
+#' timestamp column from that dataframe. The function uses the timestamp 
+#' to determine what day of the week the accident occured on. It then checks if 
+#' the day of the week is Saturday or Sunday and classifies each element in the
+#' column as either a Weekend or Weekday. A column with this information is 
+#' added to the accidents data set.
+#' @param accidents_dataset 
+#' @param weather_timestamp 
+#'
+#' @return accidents_dataset
 weather_weekday_or_weekend <- function(accidents_dataset, 
                                        weather_timestamp = "Weather_Timestamp"){
   day_of_week <- wday(x = accidents_dataset[[weather_timestamp]], 
@@ -84,8 +103,6 @@ weather_weekday_or_weekend <- function(accidents_dataset,
   accidents_dataset[["Weather_Weekday_Weekend"]] <- weekday_or_weekend
   return(accidents_dataset)
 }
-
-accidents <- weather_weekday_or_weekend(accidents)
 
 # Weather Features ----
 
@@ -104,6 +121,18 @@ accidents <- weather_weekday_or_weekend(accidents)
 #                                 perl = TRUE,
 #                                 ignore.case = TRUE)
 
+#' Title
+#' @description This function adds a Thunder column to the accidents data set. 
+#' The function looks at the Weather_Condition column in the accidents data set, 
+#' and looks for instances of the words "thunder" or "t-storm" in the column. 
+#' The function is not case sensitive so all instances are
+#' captured. If the word is in the given row of the column the thunder column 
+#' gets a 1, otherwise 0. The function returns the accident data set with the 
+#' new Thunder column.
+#' @param accidents_dataset 
+#' @param weather_column 
+#'
+#' @return accidents_dataset
 add_thunder <- function(accidents_dataset, 
                         weather_column = "Weather_Condition"){
   #' This function accepts a data frame with a character indicating which 
@@ -123,10 +152,19 @@ add_thunder <- function(accidents_dataset,
   
   }
 
-accidents <- add_thunder(accidents)
-
 # Function to identify if "Rain" is in the Weather Condition 
 
+#' Title
+#' @description This function adds a rain column to the accidents data set. The 
+#' function looks at the Weather_Condition column in the accidents data set, and 
+#' looks for instances of the words "rain", "drizzle", "mist", or "shower"
+#' in the column. The function is not case sensitive so all instances are
+#' captured. If the word is in the given row of the column the Rain column gets 
+#' a 1, otherwise 0.
+#' @param accidents_dataset 
+#' @param weather_column 
+#'
+#' @return accidents_dataset
 add_rain <- function(accidents_dataset, weather_column = "Weather_Condition"){
   pattern <- "rain|drizzle|mist|shower"
   rain_found <- grepl(pattern = pattern, 
@@ -138,10 +176,19 @@ add_rain <- function(accidents_dataset, weather_column = "Weather_Condition"){
   return(accidents_dataset)
 }
 
-accidents <- add_rain(accidents)
-
 # Function to identify if "Snow" is in the Weather Condition
 
+#' Title
+#' @description This function adds a snow column to the accidents data set. The 
+#' function looks at the Weather_Condition column in the accidents data set, and 
+#' looks for instances of the words "snow", "ice", "freezing", "wintry", or 
+#' "hail" in the column. The function is not case sensitive so all instances are
+#' captured. If the word is in the given row of the column the snow column gets 
+#' a 1, otherwise 0.
+#' @param accidents_dataset 
+#' @param weather_column 
+#'
+#' @return accidents_dataset 
 add_snow <- function(accidents_dataset, weather_column = "Weather_Condition"){
   pattern <- "snow|ice|freezing|wintry|hail"
   snow_found <- grepl(pattern = pattern, 
@@ -153,13 +200,23 @@ add_snow <- function(accidents_dataset, weather_column = "Weather_Condition"){
   return(accidents_dataset)
 }
 
-accidents <- add_snow(accidents)
-
 # NOTE: Some columns will be removed in modeling and haven't been engineered
 
 # Alter Severity to be binary - < 3 or 3+ (call it Low and High) 
   # MAKE SURE the levels are Low = 0, and High = 1 !!!! 
 
+#' Title
+#' @description 
+#' This function looks at the Severity column from the sample accidents data set
+#' and classifies the Severity as either High or Low. Severity is initially 
+#' rated as either 1,2,3, or 4, 1 being the lowest and 4 being the highest 
+#' severity. The most severe accidents are of interest here so Severity is made
+#' binary (1,0) with 4 being considered High (1), and 1-3 being considered 
+#' Low (0).
+#' @param accidents_dataset 
+#' @param severity_column 
+#'
+#' @return accidents_dataset
 severity_now <- function(accidents_dataset, severity_column = "Severity"){
   severity_high_low <- ifelse(accidents_dataset[[severity_column]] == 4, 
                               "High", 
@@ -170,8 +227,14 @@ severity_now <- function(accidents_dataset, severity_column = "Severity"){
   return(accidents_dataset)
 }
 
-accidents <- severity_now(accidents)
+
+accidents_for_modeling <- weekday_weather(accidents_select)
+accidents_for_modeling <- weather_weekday_or_weekend(accidents_for_modeling)
+accidents_for_modeling <- add_thunder(accidents_for_modeling)
+accidents_for_modeling <- add_rain(accidents_for_modeling)
+accidents_for_modeling <- add_snow(accidents_for_modeling)
+accidents_for_modeling <- severity_now(accidents_for_modeling)
 
 # SAVE THE FINAL DATASET - accidents_for_modeling
 
-saveRDS(object = accidents, file = "Data/processed_accidents.rds")
+saveRDS(object = accidents_for_modeling, file = "Data/processed_accidents.rds")
